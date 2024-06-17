@@ -93,6 +93,7 @@ class allocator4: public allocator {
             perror("mmap");
             return NULL;
         }
+        madvise(ptr, size, MADV_POPULATE_WRITE);
         return ptr;
     }
     void* realloc(void* ptr, size_t oldSize, size_t newSize) {
