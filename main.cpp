@@ -84,13 +84,40 @@ class allocator3: public allocator {
     }
 };
 
+//MADV_POPULATE_WRITE
+class allocator4: public allocator {
+    public:
+    void* alloc(size_t size) {
+        void* ptr = mmap((void*)0, size, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        if (ptr == MAP_FAILED) {
+            perror("mmap");
+            return NULL;
+        }
+        return ptr;
+    }
+    void* realloc(void* ptr, size_t oldSize, size_t newSize) {
+        void* newptr = mmap((void*)0, newSize, PROT_READ | PROT_WRITE, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
+        if (newptr == MAP_FAILED) {
+            perror("mmap");
+            return NULL;
+        }
+        ::memcpy(newptr, ptr, oldSize);
+        madvise(newptr, newSize, MADV_POPULATE_WRITE);
+        munmap(ptr, oldSize);
+        return newptr;
+    }
+    void free(void* ptr, size_t size) {
+        munmap(ptr, size);
+    }
+};
+
 void f1(allocator &a) {
     for (auto j = 0; j < 2; ++ j) {
         auto i = 10;
         auto size = 1 << i;
         void* ptr = a.alloc(size);
         auto dst_size = 0;
-        for (; i < 30; ++ i) {
+        for (; i < 25; ++ i) {
             dst_size = 1 << (i + 1);
             memset(ptr, 0, size);
             ptr = a.realloc(ptr, size, dst_size);
