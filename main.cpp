@@ -1,8 +1,8 @@
 #include <iostream>
 #include <sys/mman.h>
 #include <cstring>
-#include "PerfEvent.hpp"
-
+#define CODEGEN_PERF
+#include "Perf.h"
 
 class allocator {
     public:
@@ -105,11 +105,17 @@ int main(int argc, char** argv) {
         return -1;
     }
     int use1 = atoi(argv[1]);
+    std::vector<PerfEvent> myEvents = {
+        {PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS},
+        {PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS_MIN},
+        {PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS_MAJ},
+        {PERF_TYPE_SOFTWARE, PERF_COUNT_SW_ALIGNMENT_FAULTS},
+        {PERF_TYPE_SOFTWARE, PERF_COUNT_SW_EMULATION_FAULTS},
+    };
+    facebook::velox::codegen::Perf p(myEvents);
     allocator1 a;
     allocator2 b;
     allocator3 c;
-    PerfEvent e;
-    e.startCounters();
     char *x;
     switch (use1) {
         case 0:
@@ -128,8 +134,5 @@ int main(int argc, char** argv) {
             std::cout << "invalid" << std::endl;
             break;
     }
-    e.stopCounters();
-    e.printReport(std::cout, 1); // use n as scale factor
-    std::cout << std::endl;
   return 0;
 }

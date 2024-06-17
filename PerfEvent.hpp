@@ -70,18 +70,21 @@ struct PerfEvent {
    std::chrono::time_point<std::chrono::steady_clock> stopTime;
 
    PerfEvent() {
-      registerCounter("cycles", PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES);
+      /*registerCounter("cycles", PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES);
       registerCounter("kcycles", PERF_TYPE_HARDWARE, PERF_COUNT_HW_CPU_CYCLES, KERNEL);
       registerCounter("instructions", PERF_TYPE_HARDWARE, PERF_COUNT_HW_INSTRUCTIONS);
       registerCounter("L1-misses", PERF_TYPE_HW_CACHE, PERF_COUNT_HW_CACHE_L1D|(PERF_COUNT_HW_CACHE_OP_READ<<8)|(PERF_COUNT_HW_CACHE_RESULT_MISS<<16));
       registerCounter("LLC-misses", PERF_TYPE_HARDWARE, PERF_COUNT_HW_CACHE_MISSES);
       registerCounter("branch-misses", PERF_TYPE_HARDWARE, PERF_COUNT_HW_BRANCH_MISSES);
-      registerCounter("task-clock", PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK);
+      registerCounter("task-clock", PERF_TYPE_SOFTWARE, PERF_COUNT_SW_TASK_CLOCK);*/
+      // registerCounter("pagefault", PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS);
+      registerCounter("pagefault_min", PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS_MIN);
+      registerCounter("pagefault_maj", PERF_TYPE_SOFTWARE, PERF_COUNT_SW_PAGE_FAULTS_MAJ);
       // additional counters can be found in linux/perf_event.h
 
       for (unsigned i=0; i<events.size(); i++) {
          auto& event = events[i];
-         event.fd = static_cast<int>(syscall(__NR_perf_event_open, &event.pe, 0, -1, -1, 0));
+         event.fd = static_cast<int>(syscall(SYS_perf_event_open, &event.pe, 0, -1, -1, 0));
          if (event.fd < 0) {
             std::cerr << "Error opening counter " << names[i] << std::endl;
             events.resize(0);
