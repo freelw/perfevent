@@ -1,6 +1,7 @@
 #include <iostream>
 #include <sys/mman.h>
 #include <cstring>
+#include "PerfEvent.hpp"
 
 
 class allocator {
@@ -107,6 +108,8 @@ int main(int argc, char** argv) {
     allocator1 a;
     allocator2 b;
     allocator3 c;
+    PerfEvent e;
+    e.startCounters();
     char *x;
     switch (use1) {
         case 0:
@@ -125,5 +128,8 @@ int main(int argc, char** argv) {
             std::cout << "invalid" << std::endl;
             break;
     }
+    e.stopCounters();
+    e.printReport(std::cout, 1); // use n as scale factor
+    std::cout << std::endl;
   return 0;
 }
