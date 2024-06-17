@@ -102,8 +102,8 @@ class allocator4: public allocator {
             perror("mmap");
             return NULL;
         }
-        ::memcpy(newptr, ptr, oldSize);
         madvise(newptr, newSize, MADV_POPULATE_WRITE);
+        ::memcpy(newptr, ptr, oldSize);
         munmap(ptr, oldSize);
         return newptr;
     }
@@ -129,7 +129,7 @@ void f1(allocator &a) {
     }
 }
 int main(int argc, char** argv) {
-    if (argc < 2) {   
+    if (argc < 2) {
         return -1;
     }
     int use1 = atoi(argv[1]);
