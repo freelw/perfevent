@@ -143,6 +143,7 @@ int main(int argc, char** argv) {
     allocator1 a;
     allocator2 b;
     allocator3 c;
+    allocator4 d;
     char *x;
     switch (use1) {
         case 0:
@@ -156,6 +157,10 @@ int main(int argc, char** argv) {
         case 2:
             std::cout << "jemalloc" << std::endl;
             f1(c);
+            break;
+        case 3:
+            std::cout << "madvise" << std::endl;
+            f1(d);
             break;
         default:
             std::cout << "invalid" << std::endl;
